@@ -27,7 +27,7 @@ window.__ModuleLoader__.load({
           ctx.slots.inject(slot, () => ctx.slots.register({
             name: slot,
             id: 'dsh-store-hello',
-            order: 1,
+            order: -99,
             locale: ns,
             label: () => t('tab'),
             inject: () => ({ t }),
