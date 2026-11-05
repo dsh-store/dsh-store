@@ -1,9 +1,13 @@
 {
   "name": "dsh-store-hello",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A minimal hello-world bundle for DeepSeek Harness",
   "type": "module",
   "main": "index.js",
-  "files": ["index.js", "cordis.patch.yml"],
-  "dsh": { "bundle": { "patch": "./cordis.patch.yml" } }
+  "files": ["index.js", "client.js", "cordis.patch.yml"],
+  "exports": { ".": "./index.js", "./client": "./client.js", "./package.json": "./package.json" },
+  "dsh": {
+    "bundle": { "patch": "./cordis.patch.yml" },
+    "client": { "inject": [], "platform": "web" }
+  }
 }
