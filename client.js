@@ -1,5 +1,5 @@
 window.__ModuleLoader__.load({
-  id: 'dsh-store-hello',
+  id: 'dshstore',
   factory(require) {
     const { createElement } = require('react')
     const ns = 'dsh-store-hello'
@@ -18,7 +18,7 @@ window.__ModuleLoader__.load({
       createElement('p', null, t('description')))
 
     return {
-      name: 'dsh-store-hello',
+      name: 'dshstore',
       inject: ['slots', 'locale'],
       apply(ctx) {
         ctx.effect(() => ctx.locale.register(ns, dictionaries), 'dsh-store: translations')
@@ -26,7 +26,7 @@ window.__ModuleLoader__.load({
         for (const slot of ['plugins.tab', 'settings.plugins.tab']) {
           ctx.slots.inject(slot, () => ctx.slots.register({
             name: slot,
-            id: 'dsh-store-hello',
+            id: 'dshstore',
             order: -99,
             locale: ns,
             label: () => t('tab'),

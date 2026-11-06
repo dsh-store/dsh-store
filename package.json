@@ -1,7 +1,9 @@
 {
-  "name": "dsh-store-hello",
-  "version": "0.3.1",
-  "description": "A minimal hello-world bundle for DeepSeek Harness",
+  "name": "dshstore",
+  "version": "0.4.0",
+  "description": "A simple DSH Store test page for DeepSeek Harness",
+  "repository": { "type": "git", "url": "git+https://github.com/dshstore/dshstore.git" },
+  "homepage": "https://github.com/dshstore/dshstore#readme",
   "type": "module",
   "main": "index.js",
   "files": ["index.js", "client.js", "cordis.patch.yml"],
