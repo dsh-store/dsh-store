@@ -24,6 +24,7 @@ The UI implementation in this repository is independently written. It does not c
 - Browse bilingual category labels and plugin descriptions.
 - Inspect the upstream repository and published version.
 - Send npm installs to DSH's native install flow, including its confirmation and progress UI.
+- Follow DSH's built-in light, dark, and system theme through its semantic design tokens.
 - Fall back to the upstream index URL if jsDelivr cannot be reached.
 
 ## Project
