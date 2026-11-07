@@ -1,6 +1,6 @@
 {
   "name": "dshget",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "A visual community plugin catalog for DeepSeek Harness",
   "repository": { "type": "git", "url": "git+https://github.com/dshget/dshget.git" },
   "homepage": "https://github.com/dshget/dshget#readme",
@@ -11,6 +11,6 @@
   "exports": { ".": "./index.js", "./client": "./client.js", "./package.json": "./package.json" },
   "dsh": {
     "bundle": { "patch": "./cordis.patch.yml" },
-    "client": { "inject": ["@deepseek-ai/dsh-client-ui-theme"], "platform": "web" }
+    "client": { "platform": "web" }
   }
 }
