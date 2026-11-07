@@ -1,5 +1,5 @@
-export const name = 'dshstore'
+export const name = 'dshget'
 
 export function apply() {
-  console.log('[dshstore] Hi there!')
+  console.log('[dshget] Hi there!')
 }

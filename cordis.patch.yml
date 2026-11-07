@@ -1,3 +1,3 @@
 - insert:
-    - id: dshstore
-      name: dshstore
+    - id: dshget
+      name: dshget
