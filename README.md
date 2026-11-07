@@ -22,6 +22,7 @@ The UI implementation in this repository is independently written. It does not c
 
 - Search by package, author, description, repository, and keywords.
 - Browse bilingual category labels and plugin descriptions.
+- Use a responsive featured-category strip, full-width adaptive grid, and catalog or newest-first sorting.
 - Inspect the upstream repository and published version.
 - Send npm installs to DSH's native install flow, including its confirmation and progress UI.
 - Follow DSH's light and dark page palette without depending on an optional theme service.
