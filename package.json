@@ -1,7 +1,7 @@
 {
   "name": "dshget",
-  "version": "0.1.1",
-  "description": "A simple DSH Get test page for DeepSeek Harness",
+  "version": "0.2.0",
+  "description": "A visual community plugin catalog for DeepSeek Harness",
   "repository": { "type": "git", "url": "git+https://github.com/dshget/dshget.git" },
   "homepage": "https://github.com/dshget/dshget#readme",
   "bugs": { "url": "https://github.com/dshget/dshget/issues" },
@@ -11,6 +11,6 @@
   "exports": { ".": "./index.js", "./client": "./client.js", "./package.json": "./package.json" },
   "dsh": {
     "bundle": { "patch": "./cordis.patch.yml" },
-    "client": { "inject": ["@deepseek-ai/dsh-client-locale"], "platform": "web" }
+    "client": { "platform": "web" }
   }
 }

@@ -1,15 +1,35 @@
-# DSH Get — Hello 测试插件
+# DSH Get
 
-这是用于 DeepSeek Harness 的第三方测试插件，在支持插件页扩展的版本中提供「DSH Get」标签，展示 `Hi there!`。
+DSH Get is an independent visual directory for community plugins inside DeepSeek Harness. It reads the public Awesome DSH Plugin index and asks DSH's own plugin manager to handle installation and confirmation.
 
-在 DSH 桌面版「添加插件」中输入 npm 包名：
+## Install
+
+In DSH Desktop, open Plugins → Add plugin and enter:
 
 ```text
 dshget
 ```
 
-安装后重启 DSH，在插件页面查看「DSH Get」。标签和页面接入 DSH 的语言服务，提供中文、英语、俄语、法语、西班牙语、阿拉伯语、日语和韩语翻译；可选择的语言由 DSH 本身及已安装语言包决定。测试版本没有商店功能。之前安装过 `dsh-store-hello` 或 `dshstore` 的用户应先卸载旧插件，避免同时出现两个标签。
+Restart DSH if the DSH Get tab does not appear immediately. The in-app install action requires a DSH version whose `plugins.tab` slot provides the host `install` callback; on older hosts the catalog remains browseable, while install is available through each entry's upstream npm or GitHub link.
 
-项目地址： https://github.com/dshget/dshget
+## Catalog and licensing
 
-这是独立社区项目，与 DeepSeek 官方无隶属关系。
+The catalog is fetched from `dsh-plugin-catalog`, which publishes the same machine-readable directory as [awesome-dsh-plugin.com](https://awesome-dsh-plugin.com). DSH Get credits the catalog source and its CC0 1.0 dedication. Catalog permission applies to the directory data; it does not change the separate license or terms of each listed plugin. Inclusion is not a security review, compatibility guarantee, or endorsement.
+
+The UI implementation in this repository is independently written. It does not copy source code from dsh-market.
+
+## Features
+
+- Search by package, author, description, repository, and keywords.
+- Browse bilingual category labels and plugin descriptions.
+- Inspect the upstream repository and published version.
+- Send npm installs to DSH's native install flow, including its confirmation and progress UI.
+- Fall back to the upstream index URL if jsDelivr cannot be reached.
+
+## Project
+
+- GitHub: https://github.com/dshget/dshget
+- npm: https://www.npmjs.com/package/dshget
+- Catalog attribution: https://github.com/awesome-dsh-plugin/awesome-dsh-plugin
+
+DSH Get is an independent community project and is not affiliated with DeepSeek.
