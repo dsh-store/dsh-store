@@ -1,6 +1,6 @@
 {
   "name": "dshget",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "A visual community plugin catalog for DeepSeek Harness",
   "repository": { "type": "git", "url": "git+https://github.com/dshget/dshget.git" },
   "homepage": "https://github.com/dshget/dshget#readme",

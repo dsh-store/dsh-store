@@ -9,14 +9,14 @@ window.__ModuleLoader__.load({
     const text = {
       zh: {
         tab: 'DSH Get', title: '发现适合你的插件', subtitle: '浏览社区插件，了解来源后交给 DSH 安装。', search: '搜名称、作者或功能', all: '全部', popular: '热门分类', count: n => `${n.toLocaleString()} 个条目`,
-        install: '安装', details: '详情', back: '返回列表', loading: '正在读取社区目录…', loadingHint: '目录来自 Awesome DSH Plugin', retry: '重试', empty: '没有找到匹配的插件', emptyHint: '试试更短的关键词或选择其他分类。',
+        install: '安装', details: '详情', refresh: '刷新', back: '返回列表', loading: '正在读取社区目录…', loadingHint: '目录来自 Awesome DSH Plugin', retry: '重试', empty: '没有找到匹配的插件', emptyHint: '试试更短的关键词或选择其他分类。',
         source: '目录来源', author: '作者 / 仓库', version: '最新版本', kind: '分发方式', npm: 'npm 包', github: 'GitHub 仓库',
         attribution: '目录数据来自 Awesome DSH Plugin，依据 CC0 1.0 提供。插件由各自作者维护；收录不代表 DSH Get 审核或背书。',
         openSource: '查看上游目录', error: '目录暂时无法读取', errorHint: '检查网络后重试；也可以稍后再来。', installHint: 'DSH 将显示原生安装确认和进度。', noDescription: '作者没有提供简介。', close: '关闭',
       },
       en: {
         tab: 'DSH Get', title: 'Find your next plugin', subtitle: 'Explore community plugins, review their sources, then install with DSH.', search: 'Search name, author, or feature', all: 'All', popular: 'Categories', count: n => `${n.toLocaleString()} listings`,
-        install: 'Install', details: 'Details', back: 'Back to results', loading: 'Loading the community catalog…', loadingHint: 'Catalog provided by Awesome DSH Plugin', retry: 'Retry', empty: 'No matching plugins', emptyHint: 'Try a shorter search or another category.',
+        install: 'Install', details: 'Details', refresh: 'Refresh', back: 'Back to results', loading: 'Loading the community catalog…', loadingHint: 'Catalog provided by Awesome DSH Plugin', retry: 'Retry', empty: 'No matching plugins', emptyHint: 'Try a shorter search or another category.',
         source: 'Catalog source', author: 'Author / repository', version: 'Latest version', kind: 'Distribution', npm: 'npm package', github: 'GitHub repository',
         attribution: 'Catalog data from Awesome DSH Plugin, released under CC0 1.0. Plugins are maintained by their respective authors; listing is not a DSH Get review or endorsement.',
         openSource: 'View upstream catalog', error: 'The catalog could not be loaded', errorHint: 'Check your connection and retry, or come back later.', installHint: 'DSH will show its native installation confirmation and progress.', noDescription: 'The author has not provided a description.', close: 'Close',
@@ -29,7 +29,7 @@ window.__ModuleLoader__.load({
     `
     function App({ t, install }) {
       const [lang, setLang] = useState(() => (navigator.language || 'en').toLowerCase().startsWith('zh') ? 'zh' : 'en')
-      const [catalog, setCatalog] = useState(null)
+      const [catalog, setCatalog] = useState(() => window.__DSHGET_CATALOG_CACHE__?.data || null)
       const [error, setError] = useState('')
       const [query, setQuery] = useState('')
       const [category, setCategory] = useState('')
@@ -38,19 +38,37 @@ window.__ModuleLoader__.load({
       const [installing, setInstalling] = useState('')
       const tx = text[lang]
       const pageSize = 24
-      const load = React.useCallback(async () => {
-        setError('')
-        setCatalog(null)
-        for (const url of [CATALOG, FALLBACK]) {
-          try {
-            const response = await fetch(url, { headers: { accept: 'application/json' }, cache: 'no-cache' })
-            if (!response.ok) throw new Error(`HTTP ${response.status}`)
-            const data = await response.json()
-            if (data?.format !== 1 || !Array.isArray(data.plugins) || !data.metadata?.categories) throw new Error('Unsupported catalog format')
-            setCatalog(data)
-            return
-          } catch (cause) { setError(String(cause?.message || cause)) }
+      const load = React.useCallback(async ({ force = false } = {}) => {
+        const key = '__DSHGET_CATALOG_CACHE__'
+        const cached = window[key]
+        if (cached?.data) setCatalog(cached.data)
+        if (!force && cached?.data && Date.now() - cached.fetchedAt < 10 * 60 * 1000) return
+        if (cached?.promise) {
+          try { setCatalog(await cached.promise); setError('') } catch (cause) { setError(String(cause?.message || cause)) }
+          return
         }
+        setError('')
+        if (!cached?.data) setCatalog(null)
+        const entry = cached || { data: null, fetchedAt: 0, promise: null }
+        entry.promise = (async () => {
+          let lastError
+          for (const url of [CATALOG, FALLBACK]) {
+            try {
+              const response = await fetch(url, { headers: { accept: 'application/json' }, cache: force ? 'reload' : 'default' })
+              if (!response.ok) throw new Error(`HTTP ${response.status}`)
+              const data = await response.json()
+              if (data?.format !== 1 || !Array.isArray(data.plugins) || !data.metadata?.categories) throw new Error('Unsupported catalog format')
+              entry.data = data
+              entry.fetchedAt = Date.now()
+              return data
+            } catch (cause) { lastError = cause }
+          }
+          throw lastError || new Error('Catalog unavailable')
+        })()
+        window[key] = entry
+        try { setCatalog(await entry.promise); setError('') }
+        catch (cause) { setError(String(cause?.message || cause)) }
+        finally { entry.promise = null }
       }, [])
       useEffect(() => { load() }, [load])
       const categories = useMemo(() => {
@@ -100,13 +118,13 @@ window.__ModuleLoader__.load({
         h('style', null, css),
         h('header', { className: 'dsg-head' }, h('div', null, h('div', { className: 'dsg-kicker' }, 'DSH GET · COMMUNITY PLUGINS'), h('h1', null, tx.title), h('p', { className: 'dsg-sub' }, tx.subtitle)), h('button', { className: 'dsg-lang', onClick: () => { setLang(lang === 'zh' ? 'en' : 'zh'); setPage(0) } }, lang === 'zh' ? 'EN' : '中文')),
         catalog && h(React.Fragment, null,
-          h('div', { className: 'dsg-tools' }, h('label', { className: 'dsg-search' }, h('span', { className: 'dsg-mag', 'aria-hidden': 'true' }, '⌕'), h('input', { value: query, placeholder: tx.search, onChange: event => { setQuery(event.target.value); setPage(0) }, 'aria-label': tx.search })), h('div', { className: 'dsg-count' }, tx.count(filtered.length))),
+          h('div', { className: 'dsg-tools' }, h('label', { className: 'dsg-search' }, h('span', { className: 'dsg-mag', 'aria-hidden': 'true' }, '⌕'), h('input', { value: query, placeholder: tx.search, onChange: event => { setQuery(event.target.value); setPage(0) }, 'aria-label': tx.search })), h('div', { className: 'dsg-count' }, tx.count(filtered.length)), h('button', { className: 'dsg-btn', onClick: () => load({ force: true }) }, tx.refresh)),
           h('nav', { className: 'dsg-cats', 'aria-label': tx.popular }, h('button', { className: `dsg-chip ${category === '' ? 'on' : ''}`, onClick: () => { setCategory(''); setPage(0) } }, tx.all), ...categories.map(item => h('button', { key: item.id, className: `dsg-chip ${category === item.id ? 'on' : ''}`, onClick: () => { setCategory(item.id); setPage(0) } }, item.label))),
           visible.length ? h('main', { className: 'dsg-grid' }, ...visible.map(pluginCard)) : h('div', { className: 'dsg-status' }, h('strong', null, tx.empty), h('span', null, tx.emptyHint)),
           filtered.length > pageSize && h('div', { className: 'dsg-pager' }, h('button', { className: 'dsg-btn', disabled: page === 0, onClick: () => setPage(page - 1) }, '‹'), h('span', null, `${page + 1} / ${pageCount}`), h('button', { className: 'dsg-btn', disabled: page + 1 >= pageCount, onClick: () => setPage(page + 1) }, '›')),
           h('footer', { className: 'dsg-note' }, tx.attribution, ' ', link('https://awesome-dsh-plugin.com', tx.openSource))),
         !catalog && !error && h('div', { className: 'dsg-status' }, h('div', { className: 'dsg-spin' }), h('strong', null, tx.loading), h('span', null, tx.loadingHint)),
-        !catalog && !!error && h('div', { className: 'dsg-status' }, h('strong', null, tx.error), h('p', null, tx.errorHint), h('button', { className: 'dsg-btn primary', onClick: load }, tx.retry)),
+        !catalog && !!error && h('div', { className: 'dsg-status' }, h('strong', null, tx.error), h('p', null, tx.errorHint), h('button', { className: 'dsg-btn primary', onClick: () => load({ force: true }) }, tx.retry)),
         selected && h('div', { className: 'dsg-overlay', role: 'presentation', onMouseDown: event => { if (event.target === event.currentTarget) setSelected(null) } }, h('section', { className: 'dsg-modal', role: 'dialog', 'aria-modal': 'true', 'aria-label': selected.title || selected.name },
           h('div', { className: 'dsg-modalhead' }, h('div', null, h('div', { className: 'dsg-owner' }, selected.name), h('h2', null, selected.title || selected.name)), h('button', { className: 'dsg-x', onClick: () => setSelected(null), 'aria-label': tx.close }, '×')),
           h('p', { className: 'dsg-detail' }, selected.description?.[lang] || selected.description?.en || tx.noDescription),

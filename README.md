@@ -25,6 +25,7 @@ The UI implementation in this repository is independently written. It does not c
 - Inspect the upstream repository and published version.
 - Send npm installs to DSH's native install flow, including its confirmation and progress UI.
 - Follow DSH's light and dark page palette without depending on an optional theme service.
+- Keep the catalog in memory between tab visits and refresh it every ten minutes; refresh is also available on demand.
 - Fall back to the upstream index URL if jsDelivr cannot be reached.
 
 ## Project
